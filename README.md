@@ -1,10 +1,10 @@
 # Hashing Library
 Type
-##### Header File <br>
+##### Header File
 Language
-##### C<br>
+##### C
 Uses
-##### Basic Operations<br>
+##### Basic Operations
 
 #### Contributers
 1. Daniyal Mahmood
