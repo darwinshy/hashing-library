@@ -1,7 +1,7 @@
 # Hashing Library
-Type - Header File
-Language - C
-Uses - Basic Operations
+Type - Header File <br>
+Language - C<br>
+Uses - Basic Operations<br>
 
 #### Contributers
 1. Daniyal Mahmood
