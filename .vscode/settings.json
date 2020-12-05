@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "unordered_map": "c"
+        "unordered_map": "c",
+        "limits.h": "c"
     },
     "git.ignoreLimitWarning": true
 }

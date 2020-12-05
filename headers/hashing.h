@@ -63,7 +63,7 @@ ________________________________________________________________________________
 -------------------------------------------------------------
 *   Our hash table includes 3 items. 
 *   1.  items, an array of pointers which themselves point to
-        ht_item_string, so it is a double-pointer.
+*        ht_item_string, so it is a double-pointer.
 *   2.  size, the user defined size of our hash table.
 *   3.  count, the number of items currently in the hashtable
 -------------------------------------------------------------
@@ -141,6 +141,59 @@ ht_item_string *create_item_string(char *key, char *value)
     return item;
 }
 
+void handle_collision(HashTable_S *table, ht_item_string *item);
+/* 
+_________________________________________________________________________________
+*   Inserting hash item into the hash table. (ht_insert_s)
+-------------------------------------------------------------
+*   Create a hash item corresponding to the key and value.
+*   he pointer to ht_item_string. Same to the key
+*   value. Assign the input values to allocated memory.
+*   Return the newly created item.
+-------------------------------------------------------------
+_____________________________________________________________
+*/
+
+void ht_insert_s(HashTable_S *table, char *key, char *value)
+{
+    // Create the item
+    ht_item_string *item = create_item(key, value);
+
+    ht_item_string *current_item = table->items[index];
+
+    if (current_item == NULL)
+    {
+        // Key does not exist.
+        if (table->count == table->size)
+        {
+            // Hash Table Full
+            printf("Insert Error: Hash Table is full\n");
+            return;
+        }
+
+        // Insert directly
+        table->items[index] = item;
+        table->count++;
+    }
+
+    else
+    {
+        // Scenario 1: We only need to update value
+        if (strcmp(current_item->key, key) == 0)
+        {
+            strcpy(table->items[index]->value, value);
+            return;
+        }
+
+        else
+        {
+            // Scenario 2: Collision
+            // We will handle case this a bit later
+            handle_collision(table, item);
+            return;
+        }
+    }
+}
 /* 
 _________________________________________________________________________________
 *   Function to release memory
