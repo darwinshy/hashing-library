@@ -14,12 +14,13 @@ ________________________________________________________________________________
 */
 
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <string.h>
 /* 
 ________________________________________________________________________________________
 *   Predefining some values
 -------------------------------------------------------------
-*   1.max_modulo value to prevent overflow of Integer Value
+*   1.max_modulo value to prevent overflow of integer Value
 *   2.max_capacity is maximum size of our Hash Table.
 -------------------------------------------------------------
 ________________________________________________________________________________________
@@ -30,7 +31,7 @@ ________________________________________________________________________________
 
 /* 
 ________________________________________________________________________________________
-*   Define Types of Structure and Functions
+*   Defining Types of Structure and Functions
 _________________________________________________________________________
 */
 
@@ -39,10 +40,10 @@ _________________________________________________________________________
 typedef struct HashTable_S HashTable_S;
 typedef struct ht_item_string ht_item_string;
 typedef struct LinkedList LinkedList;
+
 /*  String-------------------------------------------------------*/
 
-unsigned long
-hash_function_string(char *str);
+unsigned long hash_function_string(char *str);
 HashTable_S *create_HT_string(int size);
 ht_item_string *create_HT_item_string(char *key, char *value);
 void insertTo_HT_string(HashTable_S *table, char *key, char *value);
@@ -55,25 +56,17 @@ unsigned long hash_function_integer(int *int_value);
 
 /*  Misc---------------------------------------------------------*/
 
+void print_search(HashTable_S *table, char *key);
+void print_table(HashTable_S *table);
 void handle_collision_HT_string(HashTable_S *table, unsigned long index, ht_item_string *item);
-
-/*
-_______________________________________________________________________________________
-*   Hashing Function (Strings)
--------------------------------------------------------------
-*       A very simple hash function, 
-*       that is based on ASCII value of the string.
--------------------------------------------------------------
-_____________________________________________________________
-*/
-
-unsigned long hash_function_string(char *str)
-{
-    unsigned long i = 0;
-    for (int j = 0; str[j]; j++)
-        i = i * i + str[j];
-    return i % max_capacity;
-}
+static LinkedList **create_overflow_buckets(HashTable_S *table);
+void free_overflow_buckets(HashTable_S *table);
+void free_item(ht_item_string *item);
+void free_table(HashTable_S *table);
+LinkedList *allocate_list();
+static void free_linkedlist(LinkedList *list);
+LinkedList *linkedlist_insert(LinkedList *list, ht_item_string *item);
+static ht_item_string *linkedlist_remove(LinkedList *list);
 
 /* 
 ________________________________________________________________________________________
@@ -111,7 +104,34 @@ struct ht_item_string
     char *key;
     char *value;
 };
+/* 
+________________________________________________________________________________________
+*   Linked List Struct for handling collisions
+-------------------------------------------------------------
+_____________________________________________________________
+*/
+struct LinkedList
+{
+    ht_item_string *item;
+    LinkedList *next;
+};
+/*
+_______________________________________________________________________________________
+*   Hashing Function (Strings)
+-------------------------------------------------------------
+*       A very simple hash function, 
+*       that is based on ASCII value of the string.
+-------------------------------------------------------------
+_____________________________________________________________
+*/
 
+unsigned long hash_function_string(char *str)
+{
+    unsigned long i = 0;
+    for (int j = 0; str[j]; j++)
+        i += str[j];
+    return i % max_capacity;
+}
 /* 
 ________________________________________________________________________________________
 *   Creating Hash Table for String (create_table_string)
@@ -153,8 +173,8 @@ ht_item_string *create_HT_item_string(char *key, char *value)
 {
     // Creates a pointer to a new hash table item
     ht_item_string *item = (ht_item_string *)malloc(sizeof(ht_item_string));
-    item->key = (char *)malloc(strlen(key) + 1);
-    item->value = (char *)malloc(strlen(value) + 1);
+    item->key = (char *)calloc(strlen(key) + 1, sizeof(char));
+    item->value = (char *)calloc(strlen(value) + 1, sizeof(char));
 
     strcpy(item->key, key);
     strcpy(item->value, value);
@@ -177,9 +197,11 @@ _____________________________________________________________
 void insertTo_HT_string(HashTable_S *table, char *key, char *value)
 {
     // Create the item
-    ht_item_string *item = create_item(key, value);
+    ht_item_string *item = create_HT_item_string(key, value);
 
-    unsigned long index = hash_function_string(key);
+    // Compute the index
+    int index = hash_function_string(key);
+
     ht_item_string *current_item = table->items[index];
 
     if (current_item == NULL)
@@ -189,6 +211,8 @@ void insertTo_HT_string(HashTable_S *table, char *key, char *value)
         {
             // Hash Table Full
             printf("Insert Error: Hash Table is full\n");
+            // Remove the create item
+            free_item(item);
             return;
         }
 
@@ -202,15 +226,17 @@ void insertTo_HT_string(HashTable_S *table, char *key, char *value)
         // Scenario 1: We only need to update value
         if (strcmp(current_item->key, key) == 0)
         {
+            free(table->items[index]->value);
+            table->items[index]->value = (char *)calloc(strlen(value) + 1, sizeof(char));
             strcpy(table->items[index]->value, value);
+            free_item(item);
             return;
         }
 
         else
         {
             // Scenario 2: Collision
-            // We will handle case this a bit later
-            handle_collision_string(table, item);
+            handle_collision_HT_string(table, index, item);
             return;
         }
     }
@@ -228,7 +254,7 @@ _____________________________________________________________
 */
 char *searchIn_HT_string(HashTable_S *table, char *key)
 {
-    int index = hash_function(key);
+    int index = hash_function_string(key);
     ht_item_string *item = table->items[index];
     LinkedList *head = table->overflow_buckets[index];
 
@@ -258,8 +284,7 @@ _____________________________________________________________
 */
 void delete_HT_item_string(HashTable_S *table, char *key)
 {
-
-    int index = hash_function(key);
+    int index = hash_function_string(key);
     ht_item_string *item = table->items[index];
     LinkedList *head = table->overflow_buckets[index];
 
@@ -291,7 +316,7 @@ void delete_HT_item_string(HashTable_S *table, char *key)
                 LinkedList *node = head;
                 head = head->next;
                 node->next = NULL;
-                table->items[index] = create_item(node->item->key, node->item->value);
+                table->items[index] = create_HT_item_string(node->item->key, node->item->value);
                 free_linkedlist(node);
                 table->overflow_buckets[index] = head;
                 return;
@@ -329,6 +354,48 @@ void delete_HT_item_string(HashTable_S *table, char *key)
 }
 /* 
 ________________________________________________________________________________________
+*   Printing Hash Tables
+_____________________________________________________________
+*/
+void print_search(HashTable_S *table, char *key)
+{
+    char *val;
+    if ((val = searchIn_HT_string(table, key)) == NULL)
+    {
+        printf("%s does not exist\n", key);
+        return;
+    }
+    else
+    {
+        printf("Key:%s, Value:%s\n", key, val);
+    }
+}
+
+void print_table(HashTable_S *table)
+{
+    printf("\n_____________________________________________________________n");
+    for (int i = 0; i < table->size; i++)
+    {
+        if (table->items[i])
+        {
+            printf("Index:%d, Key:%s, Value:%s", i, table->items[i]->key, table->items[i]->value);
+            if (table->overflow_buckets[i])
+            {
+                printf(" => Overflow Bucket => ");
+                LinkedList *head = table->overflow_buckets[i];
+                while (head)
+                {
+                    printf("Key:%s, Value:%s ", head->item->key, head->item->value);
+                    head = head->next;
+                }
+            }
+            printf("\n");
+        }
+    }
+    printf("_____________________________________________________________\n");
+}
+/* 
+________________________________________________________________________________________
 *   Handling Collisions
 -------------------------------------------------------------
 *   There are two scenarios here. 
@@ -344,6 +411,7 @@ void handle_collision_HT_string(HashTable_S *table, unsigned long index, ht_item
 
     if (head == NULL)
     {
+        // We need to create the list
         head = allocate_list();
         head->item = item;
         table->overflow_buckets[index] = head;
@@ -351,6 +419,7 @@ void handle_collision_HT_string(HashTable_S *table, unsigned long index, ht_item
     }
     else
     {
+        // Insert to the list
         table->overflow_buckets[index] = linkedlist_insert(head, item);
         return;
     }
@@ -371,7 +440,7 @@ ________________________________________________________________________________
 _____________________________________________________________
 */
 
-LinkedList **create_overflow_buckets(HashTable_S *table)
+static LinkedList **create_overflow_buckets(HashTable_S *table)
 {
     // Create the overflow buckets; an array of linkedlists
     LinkedList **buckets = (LinkedList **)calloc(table->size, sizeof(LinkedList *));
@@ -431,22 +500,16 @@ ________________________________________________________________________________
 -------------------------------------------------------------
 _____________________________________________________________
 */
-struct LinkedList
-{
-    ht_item_string *item;
-    LinkedList *next;
-};
 
 LinkedList *allocate_list()
 {
     // Allocates memory for a Linkedlist pointer
-    LinkedList *list = (LinkedList *)malloc(sizeof(LinkedList));
+    LinkedList *list = (LinkedList *)calloc(1, sizeof(LinkedList));
     return list;
 }
 
 LinkedList *linkedlist_insert(LinkedList *list, ht_item_string *item)
 {
-    // Inserts the item onto the Linked List
     if (!list)
     {
         LinkedList *head = allocate_list();
@@ -466,7 +529,7 @@ LinkedList *linkedlist_insert(LinkedList *list, ht_item_string *item)
     }
 
     LinkedList *temp = list;
-    while (temp->next->next)
+    while (temp->next)
     {
         temp = temp->next;
     }
@@ -477,4 +540,37 @@ LinkedList *linkedlist_insert(LinkedList *list, ht_item_string *item)
     temp->next = node;
 
     return list;
+}
+static ht_item_string *linkedlist_remove(LinkedList *list)
+{
+    // Removes the head from the linked list
+    // and returns the item of the popped element
+    if (!list)
+        return NULL;
+    if (!list->next)
+        return NULL;
+    LinkedList *node = list->next;
+    LinkedList *temp = list;
+    temp->next = NULL;
+    list = node;
+    ht_item_string *it = NULL;
+    memcpy(temp->item, it, sizeof(ht_item_string));
+    free(temp->item->key);
+    free(temp->item->value);
+    free(temp->item);
+    free(temp);
+    return it;
+}
+static void free_linkedlist(LinkedList *list)
+{
+    LinkedList *temp = list;
+    while (list)
+    {
+        temp = list;
+        list = list->next;
+        free(temp->item->key);
+        free(temp->item->value);
+        free(temp->item);
+        free(temp);
+    }
 }
