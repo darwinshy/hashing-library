@@ -121,7 +121,7 @@ ________________________________________________________________________________
 *   Creating Hash Table Item for String (create_item_string)
 -------------------------------------------------------------
 *   Allocate memory using malloc function and assign
-*   he pointer to ht_item_string. Same to the key
+*   the pointer to ht_item_string. Same to the key
 *   value. Assign the input values to allocated memory.
 *   Return the newly created item.
 -------------------------------------------------------------
