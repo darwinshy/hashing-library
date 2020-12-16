@@ -3,8 +3,7 @@ ________________________________________________________________________________
 *   Hashing
 -------------------------------------------------------------
 *   Implemented for listed Data Structures 
-*   1.  Integer 
-*   2.  String (array of characters)
+    String (array of characters)
 -------------------------------------------------------------
 *  Hash Table
 *   1.  Implementation through array
@@ -54,7 +53,7 @@ char *searchIn_HT_string(HashTable_S *table, char *key);
 
 unsigned long hash_function_integer(int *int_value);
 
-/*  Misc---------------------------------------------------------*/
+/*  Miscellaneous---------------------------------------------------------*/
 
 void print_search(HashTable_S *table, char *key);
 void print_table(HashTable_S *table);
