@@ -2,7 +2,8 @@
 #include "../headers/inthashing.h"
 void intHashing()
 {
-
+    printf("\n********************************************************\n");
+    printf("Closed Hashing / Simple hashing for integers");
     hash_insert_int(20);
     hash_insert_int(70);
     hash_insert_int(80);
@@ -15,7 +16,7 @@ void intHashing()
 
     hash_display_int();
 
-    printf("Searching element 70: ");
+    printf("\nSearching for 70  : ");
 
     if (hash_search_int(70))
         printf("Found\n");
@@ -24,15 +25,13 @@ void intHashing()
 
     if (hash_delete_int(70))
     {
-        printf("After Deletion of 70\n");
+        printf("\nAfter Deletion of 70\n");
         hash_display_int();
     }
     else
         printf("Value Not Present\n");
-
-    printf("_________________________________________");
-    //Open Hashing using link list
-
+    printf("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
+    printf("Open Hashing using linked list for integers");
     hash_INSERT_int(7);
     hash_INSERT_int(0);
     hash_INSERT_int(3);
@@ -42,7 +41,7 @@ void intHashing()
 
     hash_DISPLAY_int();
 
-    printf("Searching element 10: ");
+    printf("\nSearching element 10  : ");
 
     if (hash_SEARCH_int(10))
         printf("Found\n");
@@ -63,35 +62,45 @@ void intHashing()
         printf("Found\n");
     else
         printf("Not Found\n");
+
+    printf("\n********************************************************\n");
 }
 
 void stringHashing()
 {
-    char a[5] = {'F', 'i', 'r', 's', 't'};
-    char b[5] = {'S', 'e', 'c', 'o', 'n'};
-    char c[5] = {'T', 'h', 'i', 'r', 'd'};
-    char d[5] = {'F', 'o', 'u', 'r', 't'};
+    printf("\n********************************************************\n");
+    printf("Simple hashing for strings\n");
+    char a[5] = {'f', 'i', 'r', 's', 't'};
+    char b[5] = {'s', 'e', 'c', 'o', 'n'};
+    char c[5] = {'t', 'h', 'i', 'r', 'd'};
+    char d[5] = {'f', 'o', 'u', 'r', 't'};
 
-    HashTable_S *ht = create_HT_string(100);
+    HashTable_S *ht = create_HT_string(10000);
     insertTo_HT_string(ht, (char *)"1", a);
     insertTo_HT_string(ht, (char *)"2", b);
     insertTo_HT_string(ht, (char *)"H", c);
     insertTo_HT_string(ht, (char *)"C", d);
+
+    print_table(ht);
+
     print_search(ht, (char *)"1");
     print_search(ht, (char *)"2");
     print_search(ht, (char *)(char *)"3");
     print_search(ht, (char *)"Hel");
     print_search(ht, (char *)"Cau");
-    print_table(ht);
+    printf("\n________________________________________________\n");
     delete_HT_item_string(ht, (char *)"1");
     delete_HT_item_string(ht, (char *)"Cau");
+    printf("\n________________________________________________\n");
     print_table(ht);
     free_table(ht);
+    printf("\n********************************************************\n");
 }
 
 int main()
 {
     intHashing();
+
     stringHashing();
     return 0;
 }

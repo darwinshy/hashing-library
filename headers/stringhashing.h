@@ -287,6 +287,8 @@ void delete_HT_item_string(HashTable_S *table, char *key)
     ht_item_string *item = table->items[index];
     LinkedList *head = table->overflow_buckets[index];
 
+    printf("Deleting %s\n", key);
+
     if (item == NULL)
     {
         // Does not exist. Return
@@ -358,21 +360,24 @@ _____________________________________________________________
 */
 void print_search(HashTable_S *table, char *key)
 {
+
     char *val;
     if ((val = searchIn_HT_string(table, key)) == NULL)
     {
-        printf("%s does not exist\n", key);
+        printf("%s does not exist\n\n", key);
         return;
     }
     else
     {
-        printf("Key:%s, Value:%s\n", key, val);
+        printf("Value corresponing to %s was found\n", key);
+        printf("Key : %s , Value  : %s\n\n", key, val);
     }
 }
 
 void print_table(HashTable_S *table)
 {
-    printf("\n_____________________________________________________________n");
+    printf("\n________________________________________________\n");
+    printf("String Hashtable ------------------------------\n\n");
     for (int i = 0; i < table->size; i++)
     {
         if (table->items[i])
@@ -391,7 +396,8 @@ void print_table(HashTable_S *table)
             printf("\n");
         }
     }
-    printf("_____________________________________________________________\n");
+    printf("\n-----------------------------------------------");
+    printf("\n________________________________________________\n");
 }
 /* 
 ________________________________________________________________________________________

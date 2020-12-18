@@ -3,10 +3,10 @@ ________________________________________________________________________________
 *   Hashing
 -------------------------------------------------------------
 *   Implemented for listed Data Structures 
-*   1.  Integer 
+*       Integer 
 -------------------------------------------------------------
-*  Hash Table
-*   1.  Implementation through array + linked list
+*   Hash Table
+*       Implementation through array + linked list
 *       a.  Closed Hashing using simple array
 *       b.  Open Hasing using array and linked list
 -------------------------------------------------------------
@@ -165,23 +165,22 @@ _______________________________________________________
 */
 void hash_display_int()
 {
-    int i = 0;
-
-    for (i = 0; i < SIZE; i++)
-    {
-
+    printf("\n________________________________________________\n");
+    printf("Integer Hashtable ------------------------------\n\n");
+    printf("[");
+    for (int i = 0; i < SIZE; i++)
         if (hashArray[i] != NULL)
-            printf(" (%d)", hashArray[i]->data);
+            printf("(%d) ", hashArray[i]->data);
         else
-            printf(" ~~ ");
-    }
+            printf("~ ");
 
-    printf("\n");
+    printf("]");
+    printf("\n\n-----------------------------------------------");
+    printf("\n________________________________________________\n");
 }
 /*
 -------------------------------------------------------------------------------------
 */
-
 
 /* 
 _____________________________________________________________________________________
@@ -244,7 +243,6 @@ void hash_INSERT_int(int value)
     }
 }
 
-
 /* 
 _______________________________________________________
 *   The hash delete function
@@ -287,7 +285,6 @@ int hash_DELETE_int(int value)
     return 0;
 }
 
-
 /* 
 _______________________________________________________
 *   The hash table search function-
@@ -314,21 +311,15 @@ int hash_SEARCH_int(int value)
 _______________________________________________________
 *   The hash table display function
 _______________________________________________________
-*/  
+*/
 void hash_DISPLAY_int()
 {
-    int i;
-
-    for (i = 0; i < size; i++)
+    printf("\n________________________________________________\n");
+    printf("Integer Hashtable ------------------------------\n\n");
+    for (int i = 0; i < size; i++)
     {
         struct node *temp = chain[i];
-        if (temp == NULL)
-        {
-
-            printf(" ~~ ");
-        }
-
-        else
+        if (temp != NULL)
         {
 
             printf("(");
@@ -342,5 +333,6 @@ void hash_DISPLAY_int()
             printf(") ");
         }
     }
-    printf("\n");
+    printf("\n\n-----------------------------------------------");
+    printf("\n________________________________________________\n");
 }
