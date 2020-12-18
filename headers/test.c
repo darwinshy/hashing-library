@@ -1,4 +1,4 @@
-#include "../headers/stringhashing.h"
+#include "hashing.h"
 void intHashing()
 {
     printf("\n********************************************************\n");
